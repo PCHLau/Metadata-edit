@@ -1,4 +1,10 @@
 import yt_dlp
+import json
+import os 
+
+os.chdir('C:/Users/patri/Downloads')
+
+
 
 URLS = ['https://www.youtube.com/watch?v=23oZbJNSd0s']
 
@@ -15,11 +21,26 @@ ydl_opts = {
         # {'key': 'EmbedThumbnail'}
         ],
         'outtmpl': {'default': "%(title)s.%(ext)s",
-                    'thumbnail': "%(title)s.%(ext)s"},
+                    'thumbnail': "%(title)s.%(ext)s",
+                    'infojson': "data.%(ext)s"},
         'writethumbnail': True,
         'writeinfojson': True
 
 }
 
+# Download starts
 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
     error_code = ydl.download(URLS)
+
+
+# Open and read the JSON file
+with open('data.info.json', 'r') as file:
+    data = json.load(file)
+
+x=data.keys()
+
+print(x)
+
+url = data.get('thumbnail')
+
+print(url)
