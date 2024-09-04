@@ -16,7 +16,8 @@ ydl_opts = {
         ],
         'outtmpl': {'default': "%(title)s.%(ext)s",
                     'thumbnail': "%(title)s.%(ext)s"},
-        'writethumbnail': True
+        'writethumbnail': True,
+        'writeinfojson': True
 
 }
 
