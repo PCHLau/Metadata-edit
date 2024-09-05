@@ -1,13 +1,13 @@
 import yt_dlp
 import json
 import os 
-# from mutagen import MP3
+import mutagen
 
 os.chdir('C:/Users/patri/Downloads')
 
 
 
-URLS = ['https://www.youtube.com/watch?v=23oZbJNSd0s', 'https://www.youtube.com/watch?v=KTorzZ289R8']
+URLS = ['https://www.youtube.com/watch?v=SxlW79tDhCA']
 
 for i in range(len(URLS)):
     URL = [URLS[i]]
@@ -38,7 +38,7 @@ for i in range(len(URLS)):
 
 
     # Open and read the JSON file
-    with open('data.info.json', 'r') as file:
+    with open('data.info.json', 'r', encoding='utf-8') as file:
         data = json.load(file)
 
     x=data.keys()
@@ -47,7 +47,9 @@ for i in range(len(URLS)):
 
     url = data.get('categories')
 
-    name = data.get('title')
+    name = data.get('artist')
+
+    # name = name.encode('utf-8')
 
     print(url)
 
