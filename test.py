@@ -1,13 +1,14 @@
 import yt_dlp
 import json
 import os 
-import mutagen
 
 os.chdir('C:/Users/patri/Downloads')
 
+from mutagen.id3 import ID3
 
 
-URLS = ['https://www.youtube.com/watch?v=SxlW79tDhCA']
+
+URLS = ['https://www.youtube.com/watch?v=SxlW79tDhCA', 'https://www.youtube.com/watch?v=23oZbJNSd0s']
 
 for i in range(len(URLS)):
     URL = [URLS[i]]
@@ -47,15 +48,25 @@ for i in range(len(URLS)):
 
     url = data.get('categories')
 
-    name = data.get('artist')
+    name = data.get('title')
+
+    artists = data.get('artists')
 
     # name = name.encode('utf-8')
 
     print(url)
 
+    tags = id3.ID3("music.mp3")
+
+    tags.add(id3.TPE2(encoding=3, text=f"{artists[0]}"))
+
+    print(tags.getall('TXXX'))
+
     # Add metadata to mp3 file
 
     # Rename the mp3 file
 
-    os.rename('music.mp3', f'{name}.mp3')
+    # os.rename('music.mp3', f'{name}.mp3')
+
+    tags.save()
 
