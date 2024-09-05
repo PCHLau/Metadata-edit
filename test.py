@@ -6,41 +6,44 @@ os.chdir('C:/Users/patri/Downloads')
 
 
 
-URLS = ['https://www.youtube.com/watch?v=23oZbJNSd0s']
+URLS = ['https://www.youtube.com/watch?v=23oZbJNSd0s', 'https://www.youtube.com/watch?v=Ca5Tf5BDSYI']
 
-ydl_opts = {
-    'updatetime': False,
-    'format': 'bestaudio',
-    'paths': {'home': 'C:/Users/patri/Downloads'},
-    # ℹ️ See help(yt_dlp.postprocessor) for a list of available Postprocessors and their arguments
-    'postprocessors': [{  # Extract audio using ffmpeg
-        'key': 'FFmpegExtractAudio',
-        'preferredcodec': 'mp3',
-        'preferredquality': 0},
-        {'key': 'FFmpegMetadata'}
-        # {'key': 'EmbedThumbnail'}
-        ],
-        'outtmpl': {'default': "%(title)s.%(ext)s",
-                    'thumbnail': "%(title)s.%(ext)s",
-                    'infojson': "data.%(ext)s"},
-        'writethumbnail': True,
-        'writeinfojson': True
+for i in range(len(URLS)):
+    URL = [URLS[i]]
 
-}
+    ydl_opts = {
+        'updatetime': False,
+        'format': 'bestaudio',
+        'paths': {'home': 'C:/Users/patri/Downloads'},
+        # ℹ️ See help(yt_dlp.postprocessor) for a list of available Postprocessors and their arguments
+        'postprocessors': [{  # Extract audio using ffmpeg
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': 0},
+            {'key': 'FFmpegMetadata'}
+            # {'key': 'EmbedThumbnail'}
+            ],
+            'outtmpl': {'default': "%(title)s.%(ext)s",
+                        'thumbnail': "%(title)s.%(ext)s",
+                        'infojson': "data.%(ext)s"},
+            'writethumbnail': True,
+            'writeinfojson': True
 
-# Download starts
-with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-    error_code = ydl.download(URLS)
+    }
+
+    # Download starts
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        error_code = ydl.download(URL)
 
 
-# Open and read the JSON file
-with open('data.info.json', 'r') as file:
-    data = json.load(file)
+    # Open and read the JSON file
+    with open('data.info.json', 'r') as file:
+        data = json.load(file)
 
-x=data.keys()
+    x=data.keys()
 
-print(x)
+    print(x)
 
-url = data.get('thumbnail')
+    url = data.get('categories')
 
-print(url)
+    print(url)
