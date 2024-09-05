@@ -1,12 +1,13 @@
 import yt_dlp
 import json
 import os 
+# from mutagen import MP3
 
 os.chdir('C:/Users/patri/Downloads')
 
 
 
-URLS = ['https://www.youtube.com/watch?v=23oZbJNSd0s', 'https://www.youtube.com/watch?v=Ca5Tf5BDSYI']
+URLS = ['https://www.youtube.com/watch?v=23oZbJNSd0s', 'https://www.youtube.com/watch?v=KTorzZ289R8']
 
 for i in range(len(URLS)):
     URL = [URLS[i]]
@@ -23,8 +24,8 @@ for i in range(len(URLS)):
             {'key': 'FFmpegMetadata'}
             # {'key': 'EmbedThumbnail'}
             ],
-            'outtmpl': {'default': "%(title)s.%(ext)s",
-                        'thumbnail': "%(title)s.%(ext)s",
+            'outtmpl': {'default': "music.%(ext)s",
+                        'thumbnail': "thumbnail.%(ext)s",
                         'infojson': "data.%(ext)s"},
             'writethumbnail': True,
             'writeinfojson': True
@@ -46,4 +47,13 @@ for i in range(len(URLS)):
 
     url = data.get('categories')
 
+    name = data.get('title')
+
     print(url)
+
+    # Add metadata to mp3 file
+
+    # Rename the mp3 file
+
+    os.rename('music.mp3', f'{name}.mp3')
+
