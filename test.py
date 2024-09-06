@@ -8,7 +8,9 @@ import mutagen.id3 as id3
 
 
 
-URLS = ['https://www.youtube.com/watch?v=SxlW79tDhCA', 'https://www.youtube.com/watch?v=23oZbJNSd0s']
+# URLS = ['https://www.youtube.com/watch?v=SxlW79tDhCA', 'https://www.youtube.com/watch?v=23oZbJNSd0s']
+
+URLS = ['https://www.youtube.com/watch?v=BW5G7v5PqPc']
 
 for i in range(len(URLS)):
     URL = [URLS[i]]
@@ -42,22 +44,28 @@ for i in range(len(URLS)):
     with open('data.info.json', 'r', encoding='utf-8') as file:
         data = json.load(file)
 
+
+    # Show keys
     x=data.keys()
 
     print(x)
 
-    url = data.get('categories')
+    # Obtain relevant json data
 
+    cat = data.get('categories')
     name = data.get('title')
-
     artists = data.get('artists')
+    print(name)
+
+    # Clean up data
+
+    if artists == None:
+        artists = data.get('uploader')
 
     def dupe_remove(x):
         return list(dict.fromkeys(x))
 
     artists = dupe_remove(artists)
-
-    print(url)
 
     # Add metadata to mp3 file
 
@@ -65,9 +73,14 @@ for i in range(len(URLS)):
 
     tags.add(id3.TPE2(encoding=3, text=f"{artists[0]}"))
 
+    tags.save()
+
     # Rename the mp3 file
 
-    # os.rename('music.mp3', f'{name}.mp3')
-
-    tags.save()
+    try:
+        os.rename('music.mp3', f'{name}.mp3')
+    except FileExistsError:
+        os.remove(f'{name}.mp3')
+        os.rename('music.mp3', f'{name}.mp3')
+        
 
