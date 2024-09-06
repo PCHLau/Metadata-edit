@@ -52,17 +52,21 @@ for i in range(len(URLS)):
 
     artists = data.get('artists')
 
-    # name = name.encode('utf-8')
+    for i in range(len(artists)):
+
+
+    def dupe_remove(x):
+        return list(dict.fromkeys(x))
+
+    artists = dupe_remove(artists)
 
     print(url)
+
+    # Add metadata to mp3 file
 
     tags = id3.ID3("music.mp3")
 
     tags.add(id3.TPE2(encoding=3, text=f"{artists[0]}"))
-
-    print(tags.getall('TXXX'))
-
-    # Add metadata to mp3 file
 
     # Rename the mp3 file
 
