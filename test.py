@@ -4,7 +4,7 @@ import os
 
 os.chdir('C:/Users/patri/Downloads')
 
-from mutagen.id3 import ID3
+import mutagen.id3 as id3
 
 
 
@@ -51,9 +51,6 @@ for i in range(len(URLS)):
     name = data.get('title')
 
     artists = data.get('artists')
-
-    for i in range(len(artists)):
-
 
     def dupe_remove(x):
         return list(dict.fromkeys(x))
