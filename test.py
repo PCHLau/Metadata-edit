@@ -6,7 +6,9 @@ os.chdir('C:/Users/patri/Downloads')
 
 import mutagen.id3 as id3
 
-URLS = ['https://www.youtube.com/watch?v=SxlW79tDhCA']
+# URLS = ['https://www.youtube.com/watch?v=SxlW79tDhCA']
+URLS = ['https://www.youtube.com/watch?v=tiulg9ySfR8']
+
 
 # URLS = ['https://www.youtube.com/watch?v=SxlW79tDhCA', 'https://www.youtube.com/watch?v=23oZbJNSd0s']
 
@@ -56,8 +58,12 @@ for i in range(len(URLS)):
     name = data.get('title')
     artists = data.get('artists')
     url = data.get('webpage_url')
+    description = data.get('description')
     print(url)
+
     # Clean up data
+
+    
 
     if artists == None:
         artists = data.get('uploader')
@@ -65,29 +71,32 @@ for i in range(len(URLS)):
     def dupe_remove(x):
         return list(dict.fromkeys(x))
 
-    artists = dupe_remove(artists)
+    dupe_artists = dupe_remove(artists)
 
-    # Add metadata to mp3 file
+    # Youtube search to find missing tags
+
+    # Add and remove metadata to mp3 file
 
     tags = id3.ID3("music.mp3")
 
+    tags.delall('TXXX')
+    tags.delall('COMM')
+
     tags.add(id3.TPE2(encoding=3, text=f"{artists[0]}"))
+    tags.add(id3.COMM(encoding=3, text=f'{url}'))
+    tags.add(id3.TXXX(encoding=3, text=f'{description}'))
 
-    print(tags.getall('TXXX:purl'))
+    if dupe_artists != artists:
+        dupe_artists = ','.join(dupe_artists)
+        tags.add(id3.TPE1(encoding=3, text=f'{dupe_artists}'))
 
-    tags.add(id3.TXXX(encoding=3, desc='purl', text='test'))
-
-    print(tags.getall('TXXX:purl'))
-
-    tags.delall('TXXX:purl')
-
-    print(tags.getall('TXXX:purl')) 
-
-    print(tags.getall('TXXX'))
     
     tags.save()
 
+    print(tags.pprint())
+
     # Rename the mp3 file
+    # Need to add error fixing for banned characters
 
     try:
         os.rename('music.mp3', f'{name}.mp3')

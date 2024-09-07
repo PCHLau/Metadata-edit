@@ -1,0 +1,27 @@
+Manual:
+
+APIC - Picture
+COMM - url
+TALB - album
+TCON - genre
+TIT2 - title
+TMOO - Mood
+TPE1 - Artist
+TPE2 - Album Artist
+TIT1 - Source
+TXXX - description
+
+Future:
+
+SYLT - Synchronised lyrics
+TPE3 - Conductor
+USLT -lyrics
+TEXT - lyricist
+TCOM - composer
+
+
+Maybe:
+
+MVIN - MovementNumber
+MVNM - MovementName
+TBPM - Beats per Minute
