@@ -6,13 +6,14 @@ os.chdir('C:/Users/patri/Downloads')
 
 import mutagen.id3 as id3
 
-# URLS = ['https://www.youtube.com/watch?v=SxlW79tDhCA']
-URLS = ['https://www.youtube.com/watch?v=tiulg9ySfR8']
+# Read txt file with urls
 
+file = open('new_urls.txt', 'r')
+urls = file.read()
+URLS = urls.split('\n')
+file.close()
 
-# URLS = ['https://www.youtube.com/watch?v=SxlW79tDhCA', 'https://www.youtube.com/watch?v=23oZbJNSd0s']
-
-# URLS = ['https://www.youtube.com/watch?v=BW5G7v5PqPc']
+# yt-dlp settings
 
 for i in range(len(URLS)):
     URL = [URLS[i]]
@@ -59,7 +60,10 @@ for i in range(len(URLS)):
     artists = data.get('artists')
     url = data.get('webpage_url')
     description = data.get('description')
-    print(url)
+
+    tag = data.get('tags')
+
+    print(tag)
 
     # Clean up data
 
