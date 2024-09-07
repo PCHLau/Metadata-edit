@@ -6,11 +6,11 @@ os.chdir('C:/Users/patri/Downloads')
 
 import mutagen.id3 as id3
 
-
+URLS = ['https://www.youtube.com/watch?v=SxlW79tDhCA']
 
 # URLS = ['https://www.youtube.com/watch?v=SxlW79tDhCA', 'https://www.youtube.com/watch?v=23oZbJNSd0s']
 
-URLS = ['https://www.youtube.com/watch?v=BW5G7v5PqPc']
+# URLS = ['https://www.youtube.com/watch?v=BW5G7v5PqPc']
 
 for i in range(len(URLS)):
     URL = [URLS[i]]
@@ -55,8 +55,8 @@ for i in range(len(URLS)):
     cat = data.get('categories')
     name = data.get('title')
     artists = data.get('artists')
-    print(name)
-
+    url = data.get('webpage_url')
+    print(url)
     # Clean up data
 
     if artists == None:
@@ -73,6 +73,18 @@ for i in range(len(URLS)):
 
     tags.add(id3.TPE2(encoding=3, text=f"{artists[0]}"))
 
+    print(tags.getall('TXXX:purl'))
+
+    tags.add(id3.TXXX(encoding=3, desc='purl', text='test'))
+
+    print(tags.getall('TXXX:purl'))
+
+    tags.delall('TXXX:purl')
+
+    print(tags.getall('TXXX:purl')) 
+
+    print(tags.getall('TXXX'))
+    
     tags.save()
 
     # Rename the mp3 file
