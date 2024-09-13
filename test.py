@@ -1,6 +1,8 @@
 import yt_dlp
 import json
-import os 
+import os, sys
+from PIL import Image
+import numpy as np
 
 os.chdir('C:/Users/patri/Downloads')
 
@@ -94,10 +96,47 @@ for i in range(len(URLS)):
         dupe_artists = ','.join(dupe_artists)
         tags.add(id3.TPE1(encoding=3, text=f'{dupe_artists}'))
 
-    
-    tags.save()
+    # Add thumbnail to mp3, cropping the sides if music thumbnail is square
 
-    print(tags.pprint())
+    hor_1 = np.random.randint(0,280, 10)
+    hor_2 = np.random.randint(1000, 1280, 10)
+
+    hor = np.concatenate((hor_1, hor_2))
+
+    ver = np.random.randint(0,720,20)
+
+    # trying making it so you can access this image using a url
+    im = Image.open("thumbnail.webp")
+
+    pix = im.load()
+
+    r = np.array([])
+    g = np.array([])
+    b = np.array([])
+
+    for i in range(len(hor)):
+        for j in range(len(ver)):
+            c = np.array(pix[i,j])
+            r = np.append(r, c[0])
+            g= np.append(g, c[1])
+            b = np.append(b, c[2])
+
+    if np.max(r) - np.min(r) < 5 and np.max(g) - np.min(g) < 5 and np.max(b) - np.min(b) < 5:
+        box = (280, 0, 1000, 720)
+        region = im.crop(box)
+        region.save("thumbnail.png")
+    else:
+        im.save("thumbnail.png")
+
+    with open('thumbnailtest.png', 'rb') as albumart:
+        tags.add(id3.APIC(
+            encoding=3,
+            mime='image/jpeg',
+            type=3, desc=u'Cover',
+            data=albumart.read()
+        ))
+
+    tags.save()
 
     # Rename the mp3 file
     # Need to add error fixing for banned characters
@@ -107,5 +146,3 @@ for i in range(len(URLS)):
     except FileExistsError:
         os.remove(f'{name}.mp3')
         os.rename('music.mp3', f'{name}.mp3')
-        
-
