@@ -4,6 +4,10 @@ import os, sys
 from PIL import Image
 import numpy as np
 
+import requests
+
+
+
 os.chdir('C:/Users/patri/Downloads')
 
 import mutagen.id3 as id3
@@ -19,7 +23,7 @@ file.close()
 
 """
 
-URLS = ['https://www.youtube.com/watch?v=n9Ze1o_0VeA -m happy sad angry -a']
+URLS = ['https://www.youtube.com/watch?v=n9Ze1o_0VeA -m happy sad angry hype beautiful Anime -a']
 
 # URLS = ['https://www.youtube.com/watch?v=B5UeNLlnUOA']
 
@@ -46,9 +50,9 @@ for i in range(len(URLS)):
             # ,{'key': 'EmbedThumbnail'}
             ],
             'outtmpl': {'default': "music.%(ext)s",
-                        'thumbnail': "thumbnail.%(ext)s",
+                        # 'thumbnail': "thumbnail.%(ext)s",
                         'infojson': "data.%(ext)s"},
-            'writethumbnail': True,
+            # 'writethumbnail': True,
             'writeinfojson': True
 
     }
@@ -66,7 +70,7 @@ for i in range(len(URLS)):
     # Show keys
     x=data.keys()
 
-    # print(x)
+    print(x)
 
     # Obtain relevant json data
 
@@ -76,7 +80,10 @@ for i in range(len(URLS)):
     url = data.get('webpage_url')
     description = data.get('description')
     album = data.get('album')
-    upload_date = data.get('upload_date')
+    release_year = data.get('release_year')
+    
+
+    thumburl = data.get('thumbnail')
 
     # Clean up data
 
@@ -86,30 +93,25 @@ for i in range(len(URLS)):
     def dupe_remove(x):
         return list(dict.fromkeys(x))
 
-    dupe_artists = dupe_remove(artists)
+    artists = dupe_remove(artists)
 
     # Youtube search to find missing tags
 
-    # Add and remove metadata to mp3 file
-
     tags = id3.ID3("music.mp3")
 
-    art = artists.copy()
-    art = '; '.join(art)
-    print(art)
+    # Artist formatting
+    # art = artists.copy()
+    # art = '; '.join(art)
+    # print(art)
 
-    tags.add(id3.TPE1(encoding=3, text=art))
+    # Add metadata
+    tags.add(id3.TPE1(encoding=3, text=artists))
     tags.add(id3.TPE2(encoding=3, text=f"{artists[0]}"))
     tags.add(id3.COMM(encoding=3, text=f'{url}'))
     tags.add(id3.TXXX(encoding=3, text=f'{description}'))
     tags.add(id3.TIT2(encoding=3, text=f'{name}'))
     tags.add(id3.TALB(encoding=3, text=f'{album}'))
-    tags.add(id3.TDRC(encoding=3, text=f'{upload_date}'))
-
-
-    if dupe_artists != artists:
-        dupe_artists = ','.join(dupe_artists)
-        tags.add(id3.TPE1(encoding=3, text=f'{dupe_artists}'))
+    tags.add(id3.TDRC(encoding=3, text=f'{release_year}'))
 
     # Add thumbnail to mp3, cropping the sides if music thumbnail is square
 
@@ -121,7 +123,10 @@ for i in range(len(URLS)):
     ver = np.random.randint(0,720,20)
 
     # trying making it so you can access this image using a url
-    im = Image.open("thumbnail.webp")
+
+    im = Image.open(requests.get(thumburl, stream=True).raw)
+
+    # im = Image.open("thumbnail.webp")
 
     pix = im.load()
 
@@ -159,9 +164,10 @@ for i in range(len(URLS)):
                 moodlist = list()
                 counter = i + 1
                 while options[counter][0] != '-':
+                    options[counter] = options[counter].title()
                     moodlist.append(options[counter])
-                    print(moodlist)
                     counter += 1
+                # moodlist = '; '.join(moodlist)
                 tags.add(id3.TMOO(encoding=3, text = moodlist))
             if options[i][1] == 'a':
                 pass
