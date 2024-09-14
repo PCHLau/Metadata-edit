@@ -144,7 +144,7 @@ for i in range(len(URLS)):
         tags.add(id3.APIC(
             encoding=3,
             mime='image/jpeg',
-            type=3, desc=u'Cover',
+            type=3, desc=f'{thumburl}',
             data=albumart.read()
         ))
 
