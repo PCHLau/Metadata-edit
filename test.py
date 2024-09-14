@@ -10,15 +10,28 @@ import mutagen.id3 as id3
 
 # Read txt file with urls
 
+"""
+
 file = open('new_urls.txt', 'r')
 urls = file.read()
 URLS = urls.split('\n')
 file.close()
 
+"""
+
+URLS = ['https://www.youtube.com/watch?v=n9Ze1o_0VeA -m happy sad angry -a']
+
+# URLS = ['https://www.youtube.com/watch?v=B5UeNLlnUOA']
+
 # yt-dlp settings
 
 for i in range(len(URLS)):
-    URL = [URLS[i]]
+    INPUT = URLS[i]
+
+    options = INPUT.split(' ')
+
+    URL = options[0]
+
 
     ydl_opts = {
         'updatetime': False,
@@ -28,9 +41,9 @@ for i in range(len(URLS)):
         'postprocessors': [{  # Extract audio using ffmpeg
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
-            'preferredquality': 0},
-            {'key': 'FFmpegMetadata'}
-            # {'key': 'EmbedThumbnail'}
+            'preferredquality': 0}
+            # ,{'key': 'FFmpegMetadata'}
+            # ,{'key': 'EmbedThumbnail'}
             ],
             'outtmpl': {'default': "music.%(ext)s",
                         'thumbnail': "thumbnail.%(ext)s",
@@ -53,7 +66,7 @@ for i in range(len(URLS)):
     # Show keys
     x=data.keys()
 
-    print(x)
+    # print(x)
 
     # Obtain relevant json data
 
@@ -62,14 +75,10 @@ for i in range(len(URLS)):
     artists = data.get('artists')
     url = data.get('webpage_url')
     description = data.get('description')
-
-    tag = data.get('tags')
-
-    print(tag)
+    album = data.get('album')
+    upload_date = data.get('upload_date')
 
     # Clean up data
-
-    
 
     if artists == None:
         artists = data.get('uploader')
@@ -85,12 +94,18 @@ for i in range(len(URLS)):
 
     tags = id3.ID3("music.mp3")
 
-    tags.delall('TXXX')
-    tags.delall('COMM')
+    art = artists.copy()
+    art = '; '.join(art)
+    print(art)
 
+    tags.add(id3.TPE1(encoding=3, text=art))
     tags.add(id3.TPE2(encoding=3, text=f"{artists[0]}"))
     tags.add(id3.COMM(encoding=3, text=f'{url}'))
     tags.add(id3.TXXX(encoding=3, text=f'{description}'))
+    tags.add(id3.TIT2(encoding=3, text=f'{name}'))
+    tags.add(id3.TALB(encoding=3, text=f'{album}'))
+    tags.add(id3.TDRC(encoding=3, text=f'{upload_date}'))
+
 
     if dupe_artists != artists:
         dupe_artists = ','.join(dupe_artists)
@@ -128,13 +143,36 @@ for i in range(len(URLS)):
     else:
         im.save("thumbnail.png")
 
-    with open('thumbnailtest.png', 'rb') as albumart:
+    with open('thumbnail.png', 'rb') as albumart:
         tags.add(id3.APIC(
             encoding=3,
             mime='image/jpeg',
             type=3, desc=u'Cover',
             data=albumart.read()
         ))
+
+    # process options
+
+    for i in range(1, len(options)):
+        if options[i][0] == '-':
+            if options[i][1] == 'm':
+                moodlist = list()
+                counter = i + 1
+                while options[counter][0] != '-':
+                    moodlist.append(options[counter])
+                    print(moodlist)
+                    counter += 1
+                tags.add(id3.TMOO(encoding=3, text = moodlist))
+            if options[i][1] == 'a':
+                pass
+            if options[i][1] == 'g':
+                pass
+            if options[i][1] == 'b':
+                pass
+        else:
+            pass
+
+    print(tags.pprint())
 
     tags.save()
 

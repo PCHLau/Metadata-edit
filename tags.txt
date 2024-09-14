@@ -15,7 +15,7 @@ Future:
 
 SYLT - Synchronised lyrics
 TPE3 - Conductor
-USLT -lyrics
+USLT - lyrics
 TEXT - lyricist
 TCOM - composer
 
