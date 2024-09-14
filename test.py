@@ -23,7 +23,7 @@ file.close()
 
 """
 
-URLS = ['https://www.youtube.com/watch?v=n9Ze1o_0VeA -m happy sad angry hype beautiful Anime -a']
+URLS = ['https://www.youtube.com/watch?v=n9Ze1o_0VeA -m happy sad angry hype beautiful Anime -s Honkai: Star Rail -a']
 
 # URLS = ['https://www.youtube.com/watch?v=B5UeNLlnUOA']
 
@@ -46,13 +46,9 @@ for i in range(len(URLS)):
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
             'preferredquality': 0}
-            # ,{'key': 'FFmpegMetadata'}
-            # ,{'key': 'EmbedThumbnail'}
             ],
             'outtmpl': {'default': "music.%(ext)s",
-                        # 'thumbnail': "thumbnail.%(ext)s",
                         'infojson': "data.%(ext)s"},
-            # 'writethumbnail': True,
             'writeinfojson': True
 
     }
@@ -68,9 +64,7 @@ for i in range(len(URLS)):
 
 
     # Show keys
-    x=data.keys()
-
-    print(x)
+    # x=data.keys()
 
     # Obtain relevant json data
 
@@ -100,12 +94,12 @@ for i in range(len(URLS)):
     tags = id3.ID3("music.mp3")
 
     # Artist formatting
-    # art = artists.copy()
-    # art = '; '.join(art)
-    # print(art)
+
+    art = artists.copy()
+    art = '; '.join(art)
 
     # Add metadata
-    tags.add(id3.TPE1(encoding=3, text=artists))
+    tags.add(id3.TPE1(encoding=3, text=art))
     tags.add(id3.TPE2(encoding=3, text=f"{artists[0]}"))
     tags.add(id3.COMM(encoding=3, text=f'{url}'))
     tags.add(id3.TXXX(encoding=3, text=f'{description}'))
@@ -125,8 +119,6 @@ for i in range(len(URLS)):
     # trying making it so you can access this image using a url
 
     im = Image.open(requests.get(thumburl, stream=True).raw)
-
-    # im = Image.open("thumbnail.webp")
 
     pix = im.load()
 
@@ -167,10 +159,16 @@ for i in range(len(URLS)):
                     options[counter] = options[counter].title()
                     moodlist.append(options[counter])
                     counter += 1
-                # moodlist = '; '.join(moodlist)
+                moodlist = '; '.join(moodlist)
                 tags.add(id3.TMOO(encoding=3, text = moodlist))
-            if options[i][1] == 'a':
-                pass
+            if options[i][1] == 's':
+                source = list()
+                counter = i + 1
+                while options[counter][0] != '-':
+                    source.append(options[counter])
+                    counter += 1
+                source = ' '.join(source)
+                tags.add(id3.TIT1(encoding=3, text = source))
             if options[i][1] == 'g':
                 pass
             if options[i][1] == 'b':
@@ -178,9 +176,9 @@ for i in range(len(URLS)):
         else:
             pass
 
-    print(tags.pprint())
-
     tags.save()
+
+    print(tags.pprint())
 
     # Rename the mp3 file
     # Need to add error fixing for banned characters
