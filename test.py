@@ -14,18 +14,13 @@ import mutagen.id3 as id3
 
 # Read txt file with urls
 
-"""
+
 
 file = open('new_urls.txt', 'r')
 urls = file.read()
 URLS = urls.split('\n')
 file.close()
 
-"""
-
-# URLS = ['https://www.youtube.com/watch?v=n9Ze1o_0VeA -m happy sad angry hype beautiful Anime -s Honkai: Star Rail -a']
-
-URLS = ['https://music.youtube.com/watch?v=F6zcbiDRQqk']
 
 # yt-dlp settings
 
@@ -82,12 +77,18 @@ for i in range(len(URLS)):
     # Clean up data
 
     if artists == None:
-        artists = data.get('uploader')
+        artists = [data.get('uploader')]
 
+    # Need something more sophisticated for Hoyoverse songs
     def dupe_remove(x):
         return list(dict.fromkeys(x))
 
     artists = dupe_remove(artists)
+
+    illegal = ['/', '<', '>', ':', '"', '\\', '|', '?', '*']
+
+    for i in illegal:
+        name = name.replace(i, '')
 
     # Youtube search to find missing tags
 
@@ -109,34 +110,37 @@ for i in range(len(URLS)):
 
     # Add thumbnail to mp3, cropping the sides if music thumbnail is square
 
-    hor_1 = np.random.randint(0,280, 10)
-    hor_2 = np.random.randint(1000, 1280, 10)
+    hor_1 = np.random.randint(90,190, 10)
+    hor_2 = np.random.randint(1090, 1190, 10)
 
     hor = np.concatenate((hor_1, hor_2))
 
-    ver = np.random.randint(0,720,20)
-
-    # trying making it so you can access this image using a url
+    ver = np.random.randint(260,460,20)
 
     im = Image.open(requests.get(thumburl, stream=True).raw)
 
     pix = im.load()
 
-    r = np.array([])
-    g = np.array([])
-    b = np.array([])
+    # try to add support for multiple thumbnail sizes
 
-    for i in range(len(hor)):
-        for j in range(len(ver)):
-            c = np.array(pix[i,j])
-            r = np.append(r, c[0])
-            g= np.append(g, c[1])
-            b = np.append(b, c[2])
+    if im.size == (1280, 720):
+        r = np.array([])
+        g = np.array([])
+        b = np.array([])
 
-    if np.max(r) - np.min(r) < 5 and np.max(g) - np.min(g) < 5 and np.max(b) - np.min(b) < 5:
-        box = (280, 0, 1000, 720)
-        region = im.crop(box)
-        region.save("thumbnail.png")
+        for i in range(len(hor)):
+            for j in range(len(ver)):
+                c = np.array(pix[i,j])
+                r = np.append(r, c[0])
+                g= np.append(g, c[1])
+                b = np.append(b, c[2])
+
+        if np.max(r) - np.min(r) < 10 and np.max(g) - np.min(g) < 10 and np.max(b) - np.min(b) < 10:
+            box = (280, 0, 1000, 720)
+            region = im.crop(box)
+            region.save("thumbnail.png")
+        else:
+            im.save("thumbnail.png")
     else:
         im.save("thumbnail.png")
 
@@ -186,7 +190,7 @@ for i in range(len(URLS)):
 
     tags.save()
 
-    print(tags.pprint())
+    # print(tags.pprint())
 
     # Rename the mp3 file
     # Need to add error fixing for banned characters
