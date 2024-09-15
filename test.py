@@ -6,7 +6,7 @@ import numpy as np
 
 import requests
 
-
+from spotipytest import spot
 
 os.chdir('C:/Users/patri/Downloads')
 
@@ -23,9 +23,9 @@ file.close()
 
 """
 
-URLS = ['https://www.youtube.com/watch?v=n9Ze1o_0VeA -m happy sad angry hype beautiful Anime -s Honkai: Star Rail -a']
+# URLS = ['https://www.youtube.com/watch?v=n9Ze1o_0VeA -m happy sad angry hype beautiful Anime -s Honkai: Star Rail -a']
 
-# URLS = ['https://www.youtube.com/watch?v=B5UeNLlnUOA']
+URLS = ['https://music.youtube.com/watch?v=F6zcbiDRQqk']
 
 # yt-dlp settings
 
@@ -175,6 +175,9 @@ for i in range(len(URLS)):
                 pass
         else:
             pass
+
+    genres = spot(name, artists[0])
+    tags.add(id3.TCON(encoding=3, text = genres))
 
     tags.save()
 
