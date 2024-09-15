@@ -12,6 +12,26 @@ os.chdir('C:/Users/patri/Downloads')
 
 import mutagen.id3 as id3
 
+
+"""
+To do:
+
+Some sophisticated algorithm for avoiding weird artist formats (in Hoyoverse songs)
+
+Support for different thumbnail sizes
+
+Change destination and execution directory
+
+Empty new_urls.txt after use and send to urls.txt
+
+Add lyrics
+
+SQL
+
+Execute from commandline (both adding text and the script)
+
+"""
+
 # Read txt file with urls
 
 
