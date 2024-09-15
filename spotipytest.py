@@ -9,6 +9,9 @@ name = "coldplay" #chosen artist
 
 def spot(track, artist):
     result = sp.search(q=f'track:{track} artist:{artist}', limit=1, type='track') #search query
+    
+    track_number = result['tracks']['items'][0]['track_number']
+
     albumid = result['tracks']['items'][0]['album']['id']
 
     alb_data = sp.albums([albumid])
@@ -34,4 +37,4 @@ def spot(track, artist):
     if not genres:
         genres = list(set(art_genres)) + list(set(alb_genres))
 
-    return genres
+    return genres, track_number

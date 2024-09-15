@@ -176,8 +176,13 @@ for i in range(len(URLS)):
         else:
             pass
 
-    genres = spot(name, artists[0])
+    spots = spot(name, artists[0])
+
+    genres = spots[0]
+    track_number = str(spots[1])
+
     tags.add(id3.TCON(encoding=3, text = genres))
+    tags.add(id3.TRCK(encoding=3, text = track_number))    
 
     tags.save()
 
