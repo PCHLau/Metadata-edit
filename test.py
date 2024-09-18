@@ -7,6 +7,9 @@ import numpy as np
 import requests
 
 from spotipytest import spot
+from ytmusictest import ytmus
+from syncedlyricstest import synlyr
+from ytmusicapi import exceptions
 
 os.chdir('C:/Users/patri/Downloads')
 
@@ -29,6 +32,8 @@ Add lyrics
 SQL
 
 Execute from commandline (both adding text and the script)
+
+Maybe split into multiple files
 
 """
 
@@ -200,6 +205,8 @@ for i in range(len(URLS)):
         else:
             pass
 
+    # import genres and track number
+
     spots = spot(name, artists[0])
 
     genres = spots[0]
@@ -207,6 +214,23 @@ for i in range(len(URLS)):
 
     tags.add(id3.TCON(encoding=3, text = genres))
     tags.add(id3.TRCK(encoding=3, text = track_number))    
+
+
+    # import lyrics
+
+    lyrics = synlyr(name, artists[0])
+
+    if lyrics == None:
+        try:
+            lyrics = ytmus(name, artists[0])['lyrics']
+        except exceptions.YTMusicUserError:
+            pass
+
+    if lyrics != None:
+        if type(lyrics) == list:
+            tags.add(id3.SYLT(encoding=3, text = lyrics, format=2, type=1))
+        else:
+            tags.add(id3.USLT(encoding=3, text = f'{lyrics}'))
 
     tags.save()
 
