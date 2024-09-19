@@ -41,7 +41,9 @@ add romaji lyrics for japanese songs
 
 def downloader():
 
-    os.chdir('C:/Users/patri/Downloads')
+    # os.chdir('C:/Users/patri/Downloads')
+
+    print(os.getcwd())
 
     file = open('new_urls.txt', 'r')
     urls = file.read()
@@ -62,7 +64,7 @@ def downloader():
         ydl_opts = {
             'updatetime': False,
             'format': 'bestaudio',
-            'paths': {'home': 'C:/Users/patri/Downloads'},
+            # 'paths': {'home': 'C:/Users/patri/Downloads'},
             # ℹ️ See help(yt_dlp.postprocessor) for a list of available Postprocessors and their arguments
             'postprocessors': [{  # Extract audio using ffmpeg
                 'key': 'FFmpegExtractAudio',
@@ -241,7 +243,12 @@ def downloader():
         # Need to add error fixing for banned characters
 
         try:
-            os.rename('music.mp3', f'{name}.mp3')
+            os.replace('music.mp3', f'C:/Users/patri/Downloads/{name}.mp3')
         except FileExistsError:
             os.remove(f'{name}.mp3')
             os.rename('music.mp3', f'{name}.mp3')
+
+        os.remove('thumbnail.png')
+        os.remove('data.info.json')
+
+downloader()
