@@ -17,19 +17,13 @@ import mutagen.id3 as id3
 """
 To do:
 
-Some sophisticated algorithm for avoiding weird artist formats (in Hoyoverse songs)
+Some sophisticated algorithm for avoiding weird artist formats (in Hoyoverse songs) (next to impossible)
 
 Support for different thumbnail sizes
-
-Change destination and execution directory
 
 Empty new_urls.txt after use and send to urls.txt
 
 SQL
-
-Execute from commandline (both adding text and the script)
-
-Maybe split into multiple files
 
 Multiple album artists for album should count as a single album
 
@@ -40,8 +34,6 @@ add romaji lyrics for japanese songs
 # Read txt file with urls
 
 def downloader():
-
-    # os.chdir('C:/Users/patri/Downloads')
 
     print(os.getcwd())
 
@@ -64,7 +56,6 @@ def downloader():
         ydl_opts = {
             'updatetime': False,
             'format': 'bestaudio',
-            # 'paths': {'home': 'C:/Users/patri/Downloads'},
             # ℹ️ See help(yt_dlp.postprocessor) for a list of available Postprocessors and their arguments
             'postprocessors': [{  # Extract audio using ffmpeg
                 'key': 'FFmpegExtractAudio',
@@ -224,12 +215,15 @@ def downloader():
 
         slyrics, lyrics = synlyr(name, artists[0])
 
-        if slyrics == None:
+        if slyrics == None and lyrics == None:
             try:
                 lyrics = ytmus(name, artists[0])['lyrics']
                 tags.add(id3.USLT(encoding=3, text = f'{lyrics}'))
             except exceptions.YTMusicUserError:
                 pass
+
+        elif slyrics == None:
+            tags.add(id3.USLT(encoding=3, text = f'{lyrics}'))
         else:
             tags.add(id3.SYLT(encoding=3, text = slyrics, format=2, type=1))
             tags.add(id3.USLT(encoding=3, text = f'{lyrics}'))
@@ -237,7 +231,7 @@ def downloader():
 
         tags.save()
 
-        # print(tags.pprint())
+        print(tags.pprint())
 
         # Rename the mp3 file
         # Need to add error fixing for banned characters
@@ -251,4 +245,4 @@ def downloader():
         os.remove('thumbnail.png')
         os.remove('data.info.json')
 
-# downloader()
+downloader()
