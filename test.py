@@ -27,13 +27,15 @@ Change destination and execution directory
 
 Empty new_urls.txt after use and send to urls.txt
 
-Add lyrics
-
 SQL
 
 Execute from commandline (both adding text and the script)
 
 Maybe split into multiple files
+
+Multiple album artists for album should count as a single album
+
+Add non-synced lyrics for apple music
 
 """
 
@@ -218,19 +220,18 @@ for i in range(len(URLS)):
 
     # import lyrics
 
-    lyrics = synlyr(name, artists[0])
+    slyrics, lyrics = synlyr(name, artists[0])
 
-    if lyrics == None:
+    if slyrics == None:
         try:
             lyrics = ytmus(name, artists[0])['lyrics']
+            tags.add(id3.USLT(encoding=3, text = f'{lyrics}'))
         except exceptions.YTMusicUserError:
             pass
+    else:
+        tags.add(id3.SYLT(encoding=3, text = slyrics, format=2, type=1))
+        tags.add(id3.USLT(encoding=3, text = f'{lyrics}'))
 
-    if lyrics != None:
-        if type(lyrics) == list:
-            tags.add(id3.SYLT(encoding=3, text = lyrics, format=2, type=1))
-        else:
-            tags.add(id3.USLT(encoding=3, text = f'{lyrics}'))
 
     tags.save()
 

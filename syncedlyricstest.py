@@ -9,7 +9,9 @@ def synlyr(track, artist):
 
     lrc = lrc.split('\n')
 
-    data = list()
+    sdata = list()
+    data = str()
+    
 
     # data = str()
 
@@ -19,6 +21,7 @@ def synlyr(track, artist):
 
         # data = data + '"' + text + '"' + ' $00 ' + str(time) + ' 0A '
 
-        data.append((text, time))
+        sdata.append((text, time))
+        data = data + text + '\n'
 
-    return data
+    return sdata, data
