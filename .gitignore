@@ -9,3 +9,5 @@ __pycache__/
 src/music.egg-info/
 src/.cache
 build/
+new_urls.txt
+urls.txt
