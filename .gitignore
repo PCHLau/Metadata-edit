@@ -6,6 +6,6 @@ stuff2.txt
 __pycache__/spotipytest.cpython-311.pyc
 .cache
 __pycache__/
-src/music.egg-info
+src/music.egg-info/
 src/.cache
 build/
