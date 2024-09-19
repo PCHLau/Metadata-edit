@@ -4,7 +4,8 @@ setup(
     version='0.0.1',
     entry_points={
         'console_scripts': [
-            'music=package:test.downloader'
+            'music=test:downloader',
+            'adder=urledit:writing'
         ]
     }
 )

@@ -251,4 +251,4 @@ def downloader():
         os.remove('thumbnail.png')
         os.remove('data.info.json')
 
-downloader()
+# downloader()
