@@ -8,6 +8,7 @@ import requests
 
 from spotipytest import spot
 from ytmusictest import ytmus
+from japtest import synced, unsynced
 from syncedlyricstest import synlyr
 from ytmusicapi import exceptions
 
@@ -34,8 +35,6 @@ add romaji lyrics for japanese songs
 # Read txt file with urls
 
 def downloader():
-
-    print(os.getcwd())
 
     file = open('new_urls.txt', 'r')
     urls = file.read()
@@ -79,10 +78,9 @@ def downloader():
 
 
         # Show keys
-        # x=data.keys()
+        x=data.keys()
 
         # Obtain relevant json data
-
         cat = data.get('categories')
         name = data.get('title')
         artists = data.get('artists')
@@ -174,6 +172,8 @@ def downloader():
 
         # process options
 
+        jap = False
+
         for i in range(1, len(options)):
             if options[i][0] == '-':
                 if options[i][1] == 'm':
@@ -193,8 +193,8 @@ def downloader():
                         counter += 1
                     source = ' '.join(source)
                     tags.add(id3.TIT1(encoding=3, text = source))
-                if options[i][1] == 'g':
-                    pass
+                if options[i][1] == 'j':
+                    jap = True
                 if options[i][1] == 'b':
                     pass
             else:
@@ -215,19 +215,32 @@ def downloader():
 
         slyrics, lyrics = synlyr(name, artists[0])
 
+        # create two functions, one for synced lyrics, the other for nonsynced
+
+        if jap == True:
+            try:
+                tags.add(id3.USLT(encoding=3, text = f'{lyrics}', lang = 'jpn'))
+                lyrics = unsynced(lyrics)
+                tags.add(id3.SYLT(encoding=3, text = slyrics, format=2, type=1, lang = 'jpn'))
+                slyrics = synced(slyrics)
+            except TypeError:
+                pass
+        
+
         if slyrics == None and lyrics == None:
             try:
                 lyrics = ytmus(name, artists[0])['lyrics']
+                if jap == True:
+                    tags.add(id3.USLT(encoding=3, text = f'{lyrics}', lang = 'jpn'))
+                    lyrics = unsynced(lyrics)
                 tags.add(id3.USLT(encoding=3, text = f'{lyrics}'))
             except exceptions.YTMusicUserError:
                 pass
-
         elif slyrics == None:
             tags.add(id3.USLT(encoding=3, text = f'{lyrics}'))
         else:
             tags.add(id3.SYLT(encoding=3, text = slyrics, format=2, type=1))
             tags.add(id3.USLT(encoding=3, text = f'{lyrics}'))
-
 
         tags.save()
 
