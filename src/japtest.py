@@ -1,5 +1,4 @@
 import pykakasi
-from syncedlyricstest import synlyr
 
 def unsynced(lyrics):
     kks = pykakasi.kakasi()

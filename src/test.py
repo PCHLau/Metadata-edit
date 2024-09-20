@@ -28,7 +28,7 @@ SQL
 
 Multiple album artists for album should count as a single album
 
-add romaji lyrics for japanese songs
+might have to invest in better jap to romaji translator (cutlet)
 
 """
 
@@ -244,16 +244,16 @@ def downloader():
 
         tags.save()
 
-        print(tags.pprint())
+        # print(tags.pprint())
 
         # Rename the mp3 file
         # Need to add error fixing for banned characters
 
         try:
             os.replace('music.mp3', f'C:/Users/patri/Downloads/{name}.mp3')
-        except FileExistsError:
-            os.remove(f'{name}.mp3')
-            os.rename('music.mp3', f'{name}.mp3')
+        except PermissionError:
+            os.remove(f'C:/Users/patri/Downloads/{name}.mp3')
+            os.replace('music.mp3', f'C:/Users/patri/Downloads/{name}.mp3')
 
         os.remove('thumbnail.png')
         os.remove('data.info.json')
