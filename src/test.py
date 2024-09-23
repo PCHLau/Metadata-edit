@@ -1,4 +1,4 @@
-import yt_dlp
+import yt_dlp # type: ignore
 import json
 import os, sys
 from PIL import Image
@@ -10,7 +10,8 @@ from spotipytest import spot
 from ytmusictest import ytmus
 from japtest import synced, unsynced
 from syncedlyricstest import synlyr
-from ytmusicapi import exceptions
+from imagetest import cropper
+from ytmusicapi import exceptions # type: ignore
 
 import mutagen.id3 as id3
 
@@ -20,46 +21,49 @@ To do:
 
 Some sophisticated algorithm for avoiding weird artist formats (in Hoyoverse songs) (next to impossible)
 
-Support for different thumbnail sizes
-
 Empty new_urls.txt after use and send to urls.txt
 
 SQL
 
 Multiple album artists for album should count as a single album
 
-might have to invest in better jap to romaji translator (cutlet)
+Might have to reconsider file naming for songs that have the same name but different artist
 
 """
 
 # Read txt file with urls
 
 def downloader():
+    """Downloads and tags songs from youtube
 
+    Returns
+    -------
+    None
+
+    """
+
+    # initialise download settings from txt file
     file = open('new_urls.txt', 'r')
     urls = file.read()
     URLS = urls.split('\n')
     file.close()
 
-
-    # yt-dlp settings
-
+    # for every url (each line)
     for i in range(len(URLS)):
+        # separate urls and options
         INPUT = URLS[i]
-
         options = INPUT.split(' ')
-
         URL = options[0]
 
-
+        # yt-dlp settings
         ydl_opts = {
-            'updatetime': False,
-            'format': 'bestaudio',
+            'updatetime': False, # use time of download as time
+            'format': 'bestaudio', # best audio before encoding
             # ℹ️ See help(yt_dlp.postprocessor) for a list of available Postprocessors and their arguments
             'postprocessors': [{  # Extract audio using ffmpeg
                 'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': 0}
+                'preferredcodec': 'mp3', 
+                'preferredquality': 0} # best encoding quality
                 ],
                 'outtmpl': {'default': "music.%(ext)s",
                             'infojson': "data.%(ext)s"},
@@ -88,32 +92,29 @@ def downloader():
         description = data.get('description')
         album = data.get('album')
         release_year = data.get('release_year')
-        
-
         thumburl = data.get('thumbnail')
 
         # Clean up data
-
+        
+        # Use uploader if artist tag is empty
+        # Mostly used for non-music category videos
         if artists == None:
             artists = [data.get('uploader')]
 
-        # Need something more sophisticated for Hoyoverse songs
+        # remove duplicate artist
         def dupe_remove(x):
             return list(dict.fromkeys(x))
-
         artists = dupe_remove(artists)
 
+        # remove illegal windows file name characters in title
         illegal = ['/', '<', '>', ':', '"', '\\', '|', '?', '*']
-
         for i in illegal:
             name = name.replace(i, '')
 
-        # Youtube search to find missing tags
-
+        # initialise tag editor
         tags = id3.ID3("music.mp3")
 
         # Artist formatting
-
         art = artists.copy()
         art = '; '.join(art)
 
@@ -128,39 +129,7 @@ def downloader():
 
         # Add thumbnail to mp3, cropping the sides if music thumbnail is square
 
-        hor_1 = np.random.randint(90,190, 10)
-        hor_2 = np.random.randint(1090, 1190, 10)
-
-        hor = np.concatenate((hor_1, hor_2))
-
-        ver = np.random.randint(260,460,20)
-
-        im = Image.open(requests.get(thumburl, stream=True).raw)
-
-        pix = im.load()
-
-        # try to add support for multiple thumbnail sizes
-
-        if im.size == (1280, 720):
-            r = np.array([])
-            g = np.array([])
-            b = np.array([])
-
-            for i in range(len(hor)):
-                for j in range(len(ver)):
-                    c = np.array(pix[i,j])
-                    r = np.append(r, c[0])
-                    g= np.append(g, c[1])
-                    b = np.append(b, c[2])
-
-            if np.max(r) - np.min(r) < 10 and np.max(g) - np.min(g) < 10 and np.max(b) - np.min(b) < 10:
-                box = (280, 0, 1000, 720)
-                region = im.crop(box)
-                region.save("thumbnail.png")
-            else:
-                im.save("thumbnail.png")
-        else:
-            im.save("thumbnail.png")
+        cropper(thumburl)
 
         with open('thumbnail.png', 'rb') as albumart:
             tags.add(id3.APIC(
@@ -173,9 +142,10 @@ def downloader():
         # process options
 
         jap = False
-
         for i in range(1, len(options)):
+            # options all have '-' as first character
             if options[i][0] == '-':
+                # add moods
                 if options[i][1] == 'm':
                     moodlist = list()
                     counter = i + 1
@@ -185,6 +155,7 @@ def downloader():
                         counter += 1
                     moodlist = '; '.join(moodlist)
                     tags.add(id3.TMOO(encoding=3, text = moodlist))
+                # add music source (anime, video game, movie, etc.)
                 if options[i][1] == 's':
                     source = list()
                     counter = i + 1
@@ -193,20 +164,20 @@ def downloader():
                         counter += 1
                     source = ' '.join(source)
                     tags.add(id3.TIT1(encoding=3, text = source))
+                # translate lyrics to japanese
                 if options[i][1] == 'j':
                     jap = True
+                # nothing assigned yet
                 if options[i][1] == 'b':
                     pass
             else:
                 pass
 
-        # import genres and track number
+        # import genres and track number from spotify
 
         spots = spot(name, artists[0])
-
         genres = spots[0]
         track_number = str(spots[1])
-
         tags.add(id3.TCON(encoding=3, text = genres))
         tags.add(id3.TRCK(encoding=3, text = track_number))    
 
@@ -215,8 +186,7 @@ def downloader():
 
         slyrics, lyrics = synlyr(name, artists[0])
 
-        # create two functions, one for synced lyrics, the other for nonsynced
-
+        # translate to japanese if necessary
         if jap == True:
             try:
                 tags.add(id3.USLT(encoding=3, text = f'{lyrics}', lang = 'jpn'))
@@ -226,7 +196,8 @@ def downloader():
             except TypeError:
                 pass
         
-
+        # if synlyr did not yield lyrics, then use ytmus
+        # translate if necessary
         if slyrics == None and lyrics == None:
             try:
                 lyrics = ytmus(name, artists[0])['lyrics']
@@ -236,6 +207,7 @@ def downloader():
                 tags.add(id3.USLT(encoding=3, text = f'{lyrics}'))
             except exceptions.YTMusicUserError:
                 pass
+        # for non-syned lyrics only
         elif slyrics == None:
             tags.add(id3.USLT(encoding=3, text = f'{lyrics}'))
         else:
@@ -246,15 +218,14 @@ def downloader():
 
         # print(tags.pprint())
 
-        # Rename the mp3 file
-        # Need to add error fixing for banned characters
-
+        # Rename and move the mp3 file
         try:
             os.replace('music.mp3', f'C:/Users/patri/Downloads/{name}.mp3')
         except PermissionError:
             os.remove(f'C:/Users/patri/Downloads/{name}.mp3')
             os.replace('music.mp3', f'C:/Users/patri/Downloads/{name}.mp3')
 
+        # clean up files no longer needed
         os.remove('thumbnail.png')
         os.remove('data.info.json')
 

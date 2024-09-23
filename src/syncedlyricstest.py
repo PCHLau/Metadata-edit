@@ -1,43 +1,70 @@
-import syncedlyrics
+import syncedlyrics # type: ignore
 import re
 
-def synlyr(track, artist):
+def synlyr(track: str, artist: str) -> tuple[list, str]:
+    """Fetches synced lyrics using syncedlyrics, then reformats it
 
+    Parameters
+    ----------
+    track : str
+        Name of song/track
+    artist : str
+        Name of artist
+
+    Returns
+    -------
+    sdata: list
+        Synced lyrics in list format
+    data: str
+        Unsynced lyrics, created from synced lyrics after reformatting
+    """
+
+    # Initialise search entry
     entry = track + ' ' + artist
-
+    # Order lyrics source hierarchy
     sources = ['netease', 'musixmatch', 'lrclib']
+    # Standard synced lyrics start index for [xx:xx.xx] time format
     index=11
     for i in sources:
-        # pick the source that starts the earliest
-        lrc = syncedlyrics.search(f'{entry}', providers=[f'{i}'])
+        # Find lyrics
+        lyrics: str = syncedlyrics.search(f'{entry}', providers=[f'{i}'])
         try:
-            lrc = lrc.split('\n')
+            lrc = lyrics.split('\n')
         except AttributeError:
             continue
-
+        # Netease has special format
         if i == 'netease':
             ending = False
             endpoint = 0
-            for i in range(len(lrc)):
+            # First few lines give song/artist details
+            # Those lines have an extra ' ' extra timestamp
+            # They are found and removed
+            for j in range(len(lrc)):
+                # If the last row of details is found, break
                 if ending == True:
                     break
                 found = False
                 counter = 0
-                for j in lrc[i]:
+                for k in lrc[j]:
+                    # if the right square bracket is found
                     if found == True:
-                        if j == ' ':
+                        # If next is ' ', then it's still details line
+                        if k == ' ':
                             break
+                        # If not, lyrics have started, and loop will break next loop
                         else:
                             ending = True
-                            endpoint=i
+                            endpoint=j
                             break
-                    if j == ']':
+                    # Find where right bracket is, both for loop
+                    # And finding timestamp format
+                    if k == ']':
                         index = counter + 1
                         found = True
                     counter += 1
-            
+            # Cut out details
             lrc = lrc[endpoint:]
-
+            # Remove weird characters
             for a, b in enumerate(lrc):
                 lrc[a] = b.replace('\xa0',' ')
                 # i = i.replace('\xa0', ' ')
@@ -48,8 +75,10 @@ def synlyr(track, artist):
     data = str()
 
     for i in lrc:
+        # ignore empty elements
         if i =='':
             continue
+        # separate time (in ms) and text with previously determined index
         try:
             time  = int(i[7:9])*10 + int(i[4:6])*1000 + int(i[1:3])*1000*60
             text = i[index:]
@@ -58,7 +87,7 @@ def synlyr(track, artist):
 
         # account for different format, in this case unsynced lyrics with [verse] [chorus] etc
         except ValueError:
-            sdata = None
+            sdata = None # type: ignore
             for i in lrc:
                 if i == '':
                     continue
