@@ -1,6 +1,4 @@
 from ytmusicapi import YTMusic # type: ignore
-from ytmusicapi import exceptions
-import json
 
 def ytmus(track: str, artist: str) -> dict:
     """Gives song lyrics from YTMusic api  
@@ -23,8 +21,8 @@ def ytmus(track: str, artist: str) -> dict:
     ytmusic = YTMusic()
     results = ytmusic.search(query = f'{entry}', filter = 'songs', limit = 1)
     # Convoluted steps to get lyrics from api
-    id = results[0]['videoId']
-    result = ytmusic.get_watch_playlist(id, limit = 1)
+    video_id = results[0]['videoId']
+    result = ytmusic.get_watch_playlist(video_id, limit = 1)
     browse = result['lyrics']
     lyrics = ytmusic.get_lyrics(browse)
 

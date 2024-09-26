@@ -136,16 +136,19 @@ def downloader():
 
         cropper(thumburl)
 
-        with open('thumbnail.png', 'rb') as albumart:
-            tags.add(
-                id3.APIC(
-                    encoding=3,
-                    mime='image/jpeg',
-                    type=3,
-                    desc=f'{thumburl}',
-                    data=albumart.read(),
+        try:
+            with open('thumbnail.png', 'rb') as albumart:
+                tags.add(
+                    id3.APIC(
+                        encoding=3,
+                        mime='image/jpeg',
+                        type=3,
+                        desc=f'{thumburl}',
+                        data=albumart.read(),
+                    )
                 )
-            )
+        except FileNotFoundError:
+            pass
 
         # process options
 
