@@ -1,6 +1,7 @@
-import syncedlyrics # type: ignore
+import syncedlyrics  # type: ignore
 
-def synlyr(track: str, artist: str) -> tuple[list, str]:
+
+def synlyr(track: str, artist: str, lyr_src: str='') -> tuple[list, str, str]:
     """Fetches synced lyrics using syncedlyrics, then reformats it
 
     Parameters
@@ -17,13 +18,15 @@ def synlyr(track: str, artist: str) -> tuple[list, str]:
     data: str
         Unsynced lyrics, created from synced lyrics after reformatting
     """
-
     # Initialise search entry
     entry = track + ' ' + artist
     # Order lyrics source hierarchy
-    sources = ['netease', 'musixmatch', 'lrclib']
+    if lyr_src != '':
+        sources = [lyr_src]
+    else:
+        sources = ['netease', 'musixmatch', 'lrclib']
     # Standard synced lyrics start index for [xx:xx.xx] time format
-    index=11
+    index = 11
     source = ''
     for i in sources:
         source = i
@@ -55,7 +58,7 @@ def synlyr(track: str, artist: str) -> tuple[list, str]:
                         # If not, lyrics have started, and loop will break next loop
                         else:
                             ending = True
-                            endpoint=j
+                            endpoint = j
                             break
                     # Find where right bracket is, both for loop
                     # And finding timestamp format
@@ -67,7 +70,7 @@ def synlyr(track: str, artist: str) -> tuple[list, str]:
             lrc = lrc[endpoint:]
             # Remove weird characters
             for a, b in enumerate(lrc):
-                lrc[a] = b.replace('\xa0',' ')
+                lrc[a] = b.replace('\xa0', ' ')
                 # i = i.replace('\xa0', ' ')
 
         break
@@ -77,18 +80,18 @@ def synlyr(track: str, artist: str) -> tuple[list, str]:
 
     for i in lrc:
         # ignore empty elements
-        if i =='':
+        if i == '':
             continue
         # separate time (in ms) and text with previously determined index
         try:
-            time  = int(i[7:9])*10 + int(i[4:6])*1000 + int(i[1:3])*1000*60
+            time = int(i[7:9]) * 10 + int(i[4:6]) * 1000 + int(i[1:3]) * 1000 * 60
             text = i[index:]
             sdata.append((text, time))
             data = data + text + '\n'
 
         # account for different format, in this case unsynced lyrics with [verse] [chorus] etc
         except ValueError:
-            sdata = None # type: ignore
+            sdata = None  # type: ignore
             for i in lrc:
                 if i == '':
                     continue
@@ -97,4 +100,4 @@ def synlyr(track: str, artist: str) -> tuple[list, str]:
                 else:
                     data = data + i + '\n'
 
-    return sdata, data
+    return sdata, data, source

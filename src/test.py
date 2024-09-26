@@ -158,6 +158,7 @@ def downloader():
         # process options
 
         jap = False
+        lyr_src = ''
         for i in range(1, len(options)):
             # options all have '-' as first character
             if options[i][0] == '-':
@@ -183,9 +184,16 @@ def downloader():
                 # translate lyrics to japanese
                 if options[i][1] == 'j':
                     jap = True
-                # nothing assigned yet
-                if options[i][1] == 'b':
-                    pass
+                # give user option to choose lyrics source
+                if options[i][1] == 'l':
+                    if options[i+1] == 'l':
+                        lyr_src = 'lrclib'
+                    elif options[i+1] == 'm':
+                        lyr_src = 'musixmatch'
+                    elif options[i+1] == 'n':
+                        lyr_src = 'netease'
+                    else:
+                        pass
             else:
                 pass
 
@@ -203,7 +211,9 @@ def downloader():
 
         # import lyrics
 
-        slyrics, lyrics = synlyr(name, artists[0])
+        slyrics, lyrics, lyrics_source = synlyr(name, artists[0], lyr_src)
+
+        tags.add(id3.TENC(encoding=3, text=lyrics_source))
 
         # translate to japanese if necessary
         if jap:
@@ -237,7 +247,7 @@ def downloader():
 
         tags.save()
 
-        # print(tags.pprint())
+        print(tags.pprint())
 
         # Rename and move the mp3 file
         shutil.move('music.mp3', f'/mnt/c/Users/patri/Downloads/{name}.mp3')
