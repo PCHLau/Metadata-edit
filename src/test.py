@@ -1,3 +1,4 @@
+#! ./.venv/bin/python3
 import json
 import os
 import shutil
@@ -49,6 +50,10 @@ def downloader():
 
     # for every url (each line)
     for i, entry in enumerate(urllist):
+        # ignore empty lines
+        if entry == '':
+            continue
+
         # separate urls and options
         # entry = urllist[i]
         options = entry.split(' ')

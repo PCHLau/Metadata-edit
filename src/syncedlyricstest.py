@@ -1,5 +1,4 @@
 import syncedlyrics # type: ignore
-import re
 
 def synlyr(track: str, artist: str) -> tuple[list, str]:
     """Fetches synced lyrics using syncedlyrics, then reformats it
@@ -25,7 +24,9 @@ def synlyr(track: str, artist: str) -> tuple[list, str]:
     sources = ['netease', 'musixmatch', 'lrclib']
     # Standard synced lyrics start index for [xx:xx.xx] time format
     index=11
+    source = ''
     for i in sources:
+        source = i
         # Find lyrics
         lyrics: str = syncedlyrics.search(f'{entry}', providers=[f'{i}'])
         try:
@@ -39,15 +40,15 @@ def synlyr(track: str, artist: str) -> tuple[list, str]:
             # First few lines give song/artist details
             # Those lines have an extra ' ' extra timestamp
             # They are found and removed
-            for j in range(len(lrc)):
+            for j, line in enumerate(lrc):
                 # If the last row of details is found, break
-                if ending == True:
+                if ending:
                     break
                 found = False
                 counter = 0
-                for k in lrc[j]:
+                for k in line:
                     # if the right square bracket is found
-                    if found == True:
+                    if found:
                         # If next is ' ', then it's still details line
                         if k == ' ':
                             break
