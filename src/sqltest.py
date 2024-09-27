@@ -143,6 +143,25 @@ try:
                    );'''
     )
 
+    test = 'Test Album'
+    TEST2 = 'Test Album 2'
+
+    # add test entry
+    cursor.execute(
+        '''INSERT INTO Album (id, name) 
+        VALUES ((SELECT IFNULL(MAX(id)+1, 1) FROM Album), ?)'''
+        , (test,)
+    )
+
+    cursor.execute(
+        '''INSERT INTO Album (id, name) 
+        VALUES ((SELECT IFNULL(MAX(id)+1, 1) FROM Album), ?)'''
+        , (TEST2,)
+    )
+
+    #commit changes
+    sqliteConnection.commit()
+
     # Close the cursor
     cursor.close()
 

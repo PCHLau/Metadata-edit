@@ -139,7 +139,8 @@ def downloader():
 
         # Add thumbnail to mp3, cropping the sides if music thumbnail is square
 
-        cropper(thumburl)
+        im_size = cropper(thumburl)
+        im_size = f'{im_size[0]}x{im_size[1]}'
 
         try:
             with open('thumbnail.png', 'rb') as albumart:
@@ -180,7 +181,7 @@ def downloader():
                         source.append(options[counter])
                         counter += 1
                     source = ' '.join(source)
-                    tags.add(id3.TIT1(encoding=3, text=source))
+                    tags.add(id3.TMED(encoding=3, text=source))
                 # translate lyrics to japanese
                 if options[i][1] == 'j':
                     jap = True

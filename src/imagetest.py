@@ -3,7 +3,7 @@ import numpy as np
 from PIL import Image
 
 
-def cropper(url: str) -> None:
+def cropper(url: str) -> tuple[int, int]:
     """Crops image into desired size, usually square of adequate size
 
     Saves image as 'thumbnail.png'
@@ -20,7 +20,7 @@ def cropper(url: str) -> None:
         im = Image.open(requests.get(url, stream=True, timeout=10).raw)
     except TimeoutError:
         print("Image download timed out")
-        return
+        return (0, 0)
     pix = im.load()
 
     # create standard square or standard 1280x720
@@ -50,8 +50,10 @@ def cropper(url: str) -> None:
         ):
             box = (280, 0, 1000, 720)
             region = im.crop(box)
+            im_size = region.size
             region.save("thumbnail.png")
         else:
+            im_size = im.size
             im.save("thumbnail.png")
     # for images of non-standard size, assumption is that these are all old album covers
     # need to be cropped into square of various sizes
@@ -92,7 +94,9 @@ def cropper(url: str) -> None:
             # crop to remove border region
             box2 = (diff, diff, im.size[1] - diff, im.size[1] - diff)
             reg = region.crop(box2)
+            im_size = reg.size
             reg.save("thumbnail.png")
         # in the case the image is already square
         except ZeroDivisionError:
             im.save("thumbnail.png")
+    return im_size
