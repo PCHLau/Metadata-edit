@@ -11,12 +11,13 @@ TPE2 - Album Artist
 TIT1 - Source
 TXXX - description
 TRCK - track number
+USLT - lyrics
+SYLT - Synchronised lyrics
 
 Future:
 
-SYLT - Synchronised lyrics
+
 TPE3 - Conductor
-USLT - lyrics
 TEXT - lyricist
 TCOM - composer
 
