@@ -1,7 +1,23 @@
 import syncedlyrics  # type: ignore
+import langdetect  # type: ignore
+
+def most_common(lst: list) -> str:
+    """returns the most common element in a list
+
+    Parameters
+    ----------
+    lst : list
+        list of strings
+
+    Returns
+    -------
+    str
+        most common element in the list
+    """
+    return max(set(lst), key=lst.count)
 
 
-def synlyr(track: str, artist: str, lyr_src: str='') -> tuple[list, str, str]:
+def synlyr(track: str, artist: str, lyr_src: str='') -> tuple[list, str, str, str]:
     """Fetches synced lyrics using syncedlyrics, then reformats it
 
     Parameters
@@ -77,8 +93,14 @@ def synlyr(track: str, artist: str, lyr_src: str='') -> tuple[list, str, str]:
 
     sdata = list()
     data = str()
+    lang_list = list()
+
 
     for i in lrc:
+        try:
+            lang_list.append(langdetect.detect(i))
+        except langdetect.lang_detect_exception.LangDetectException:
+            pass
         # ignore empty elements
         if i == '':
             continue
@@ -100,4 +122,6 @@ def synlyr(track: str, artist: str, lyr_src: str='') -> tuple[list, str, str]:
                 else:
                     data = data + i + '\n'
 
-    return sdata, data, source
+    lang = most_common(lang_list)
+
+    return sdata, data, source, lang

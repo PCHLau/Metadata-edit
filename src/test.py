@@ -6,6 +6,7 @@ import shutil
 import yt_dlp  # type: ignore
 from ytmusicapi import exceptions  # type: ignore
 from mutagen import id3
+import langdetect # type: ignore
 
 from spotipytest import spot
 from ytmusictest import ytmus
@@ -212,13 +213,12 @@ def downloader():
 
         # import lyrics
 
-        slyrics, lyrics, lyrics_source = synlyr(name, artists[0], lyr_src)
+        slyrics, lyrics, lyrics_source, language = synlyr(name, artists[0], lyr_src)
 
         tags.add(id3.TENC(encoding=3, text=lyrics_source))
 
         # translate to japanese if necessary
         if jap:
-            language = 'jpn'
             try:
                 tags.add(id3.USLT(encoding=3, text=f'{lyrics}', lang='jpn'))
                 lyrics = unsynced(lyrics)
@@ -228,14 +228,13 @@ def downloader():
                 slyrics = synced(slyrics)
             except TypeError:
                 pass
-        else:
-            language = ''
 
         # if synlyr did not yield lyrics, then use ytmus
         # translate if necessary
         if slyrics is None and lyrics is None:
             try:
                 lyrics = ytmus(name, artists[0])['lyrics']
+                language = langdetect.detect(lyrics)
                 if jap:
                     tags.add(id3.USLT(encoding=3, text=f'{lyrics}', lang='jpn'))
                     lyrics = unsynced(lyrics)
@@ -252,6 +251,7 @@ def downloader():
         tags.save()
 
         print(tags.pprint())
+        print(language)
 
         # Rename and move the mp3 file
         shutil.move('music.mp3', f'/mnt/c/Users/patri/Downloads/{name}.mp3')
