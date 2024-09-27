@@ -182,7 +182,7 @@ def downloader():
                         source.append(options[counter])
                         counter += 1
                     source = ' '.join(source)
-                    tags.add(id3.TMED(encoding=3, text=source))
+                    tags.add(id3.TPUB(encoding=3, text=source))
                 # translate lyrics to japanese
                 if options[i][1] == 'j':
                     jap = True
@@ -248,10 +248,13 @@ def downloader():
             tags.add(id3.SYLT(encoding=3, text=slyrics, format=2, type=1))
             tags.add(id3.USLT(encoding=3, text=f'{lyrics}'))
 
+        # add language to tags
+        tags.add(id3.TLAN(encoding=3, text=language))
+        # tags.add(id3.TIT1(encoding=3, text='tit1'))
+        # tags.add(id3.GRP1(encoding=3, text='grp1'))
         tags.save()
 
         print(tags.pprint())
-        print(language)
 
         # Rename and move the mp3 file
         shutil.move('music.mp3', f'/mnt/c/Users/patri/Downloads/{name}.mp3')

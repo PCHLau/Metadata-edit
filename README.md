@@ -77,6 +77,7 @@ No support. sorry :disappointed:
 
 ## Roadmap
 
+* Write a script that allows adding songs to playlist, with iTunes Grouping (GRP1) as temp storage for most recent, and with Grouping as more permanent storage for all playlists
 * Use MySQL connector to put all the metadata into a database
 * Use ML to make decisions that require human intervention for now, for example:
     1. Whether lyrics match the song
