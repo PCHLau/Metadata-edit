@@ -218,6 +218,7 @@ def downloader():
 
         # translate to japanese if necessary
         if jap:
+            language = 'jpn'
             try:
                 tags.add(id3.USLT(encoding=3, text=f'{lyrics}', lang='jpn'))
                 lyrics = unsynced(lyrics)
@@ -227,6 +228,8 @@ def downloader():
                 slyrics = synced(slyrics)
             except TypeError:
                 pass
+        else:
+            language = ''
 
         # if synlyr did not yield lyrics, then use ytmus
         # translate if necessary
